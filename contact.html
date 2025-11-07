@@ -110,8 +110,11 @@
                 </div>
                 <div class="content">
                   <h4> Location</h4>
-                  <p>taita taveta</p>
-                  <p>voi</p>
+                  <p>
+                    <a class="contact-link" href="https://www.google.com/maps/search/?api=1&query=taita+taveta+voi" target="_blank" rel="noopener" style="cursor:pointer;" onclick="window.open(this.href,'_blank');return false;">
+                      Taita Taveta, Voi
+                    </a>
+                  </p>
                 </div>
               </div>
 
@@ -121,8 +124,8 @@
                 </div>
                 <div class="content">
                   <h4>Phone Number</h4>
-                  <p>+254718462802</p>
-                  <p>+254797343674</p>
+                  <p><a class="contact-link" href="tel:+254718462802" style="cursor:pointer;" onclick="window.location.href='tel:+254718462802';return false;">+254718462802</a></p>
+                  <p><a class="contact-link" href="tel:+254797343674" style="cursor:pointer;" onclick="window.location.href='tel:+254797343674';return false;">+254797343674</a></p>
                 </div>
               </div>
 
@@ -132,8 +135,8 @@
                 </div>
                 <div class="content">
                   <h4>Email Address</h4>
-                  <p>ogelobilly12@gmail.com</p>
-                  <p>onyangobilly12@gmail.com</p>
+                  <p><a class="contact-link" href="mailto:ogelobilly12@gmail.com" style="cursor:pointer;">ogelobilly12@gmail.com</a></p>
+                  <p><a class="contact-link" href="mailto:onyangobilly12@gmail.com" style="cursor:pointer;">onyangobilly12@gmail.com</a></p>
                 </div>
               </div>
             </div>
@@ -144,7 +147,18 @@
               <h3>Get In Touch</h3>
               <p> I am happy to discuss your project, network, or answer any questions.".</p>
 
-              <form action="forms/contact.php" method="post" class="php-email-form" data-aos="fade-up" data-aos-delay="200">
+              <!--
+                Switched to Formsubmit.co so the form can work without PHP on your server.
+                Formsubmit will forward the submission to the email in the action URL.
+                You (ogelobilly12@gmail.com) will need to confirm the email once (Formsubmit sends a verification link).
+              -->
+              <form action="https://formsubmit.co/ogelobilly12@gmail.com" method="POST" class="contact-form" data-aos="fade-up" data-aos-delay="200">
+                <!-- Optional: customize subject shown in email -->
+                <input type="hidden" name="_subject" value="New message from portfolio contact form">
+                <!-- Disable Formsubmit's captcha (optional). Remove or set to 'true' if you want captcha. -->
+                <input type="hidden" name="_captcha" value="false">
+                <!-- After submit, Formsubmit redirects to this URL. Change to a thank-you page if you have one. -->
+                <input type="hidden" name="_next" value="/contact.html">
                 <div class="row gy-4">
 
                   <div class="col-md-6">
@@ -164,9 +178,10 @@
                   </div>
 
                   <div class="col-12 text-center">
-                    <div class="loading">Loading</div>
-                    <div class="error-message"></div>
-                    <div class="sent-message">Your message has been sent. Thank you!</div>
+                    <!-- hidden by default; will be shown/hidden by JS -->
+                    <div class="loading d-none">Loading</div>
+                    <div class="error-message d-none"></div>
+                    <div class="sent-message d-none">Your message has been sent. Thank you!</div>
 
                     <button type="submit" class="btn">Send Message</button>
                   </div>
@@ -182,6 +197,64 @@
       </div>
 
     </section><!-- /Contact Section -->
+
+    <script>
+      // AJAX submit for Formsubmit.co and inline UX
+      document.addEventListener('DOMContentLoaded', function () {
+        const form = document.querySelector('form[action^="https://formsubmit.co"]');
+        if (!form) return;
+
+        const loading = form.querySelector('.loading');
+        const errorEl = form.querySelector('.error-message');
+        const successEl = form.querySelector('.sent-message');
+
+        form.addEventListener('submit', function (e) {
+          e.preventDefault();
+
+          const show = (el) => { if (!el) return; el.classList.remove('d-none'); el.classList.add('d-block'); };
+          const hide = (el) => { if (!el) return; el.classList.remove('d-block'); el.classList.add('d-none'); };
+
+          // Reset messages
+          if (errorEl) { hide(errorEl); errorEl.innerText = ''; }
+          if (successEl) { hide(successEl); }
+
+          // Show loading
+          if (loading) show(loading);
+
+          const action = form.getAttribute('action');
+          const formData = new FormData(form);
+
+          fetch(action, {
+            method: 'POST',
+            body: formData,
+            headers: { 'Accept': 'application/json' }
+          })
+            .then(response => {
+              // Hide loading regardless
+              if (loading) hide(loading);
+
+              if (response.ok) {
+                // Success: show sent message
+                if (successEl) show(successEl);
+                form.reset();
+              } else {
+                return response.text().then(text => {
+                  throw new Error(text || 'Form submission failed');
+                });
+              }
+            })
+            .catch(error => {
+              if (loading) hide(loading);
+              if (errorEl) {
+                errorEl.innerText = error.message || 'Could not send message.';
+                show(errorEl);
+              } else {
+                alert(error.message || 'Could not send message.');
+              }
+            });
+        });
+      });
+    </script>
 
   </main>
 
